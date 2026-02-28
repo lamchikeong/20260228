@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>極簡科技 | 產品區塊升級版</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ==============================
+           基礎樣式 (保留並微調)
+           ============================== */
+        :root {
+            --primary-color: #2d3436;
+            --secondary-color: #636e72;
+            --accent-color: #0984e3; /* 主題藍 */
+            --accent-hover: #076bba; /* 按鈕懸停色 */
+            --bg-light: #f5f6fa;
+            --white: #ffffff;
+            --border-card: #e1e8ed;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            line-height: 1.6;
+            color: var(--primary-color);
+            scroll-behavior: smooth;
+            overflow-x: hidden; /* 防止動畫導致橫向捲軸 */
+        }
+
+        /* 導覽列 */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 1rem 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            z-index: 1000;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
+        .nav-links { list-style: none; display: flex; }
+        .nav-links li { margin-left: 2rem; }
+        .nav-links a { text-decoration: none; color: var(--secondary-color); transition: color 0.3s; }
+        .nav-links a:hover { color: var(--accent-color); }
+
+        /* 通用區塊樣式 */
+        section { padding: 120px 10%; min-height: 80vh; }
+        h2 { font-size: 2.5rem; margin-bottom: 3rem; text-align: center; }
+        h2::after { content: ''; display: block; width: 40px; height: 3px; background: var(--accent-color); margin: 15px auto; }
+
+        /* ==============================
+           [重點修改] 產品展示區塊 CSS
+           ============================== */
+        #products {
+            background: var(--white);
+        }
+
+        .product-grid {
+            display: grid;
+            /* 自適應網格：最小 300px，最大平均分配 */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        /* --- 1. 卡片基礎與懸停動效 --- */
+        .product-card {
+            background: var(--white);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            overflow: hidden; /* 確保內部圖片不超出圓角 */
+            transition: all 0.4s ease; /* 平滑所有過場 */
+            display: flex;
+            flex-direction: column;
+            
+            /* CSS 動畫初始狀態：預設透明且在下方 */
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        /* 滑鼠懸停卡片時的效果 */
+        .product-card:hover {
+            transform: translateY(-10px); /* 向上浮起 (覆蓋動畫狀態) */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); /* 增加柔和陰影 */
+        }
+
+        /* --- 2. 圖片佔位符 --- */
+        .product-img-holder {
+            width: 100%;
+            height: 200px;
+            background: #dfe6e9; /* 預設灰色背景 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #b2bec3; /* 圖示顏色 */
+            font-size: 3rem; /* 圖示大小 */
+            position: relative;
+        }
+        
+        /* 模擬一個簡單的圖片圖示 */
+        .product-img-holder::after {
+            content: '🖼️'; /* 您之後可以使用 <img src="..."> 替換整個 holder */
+        }
+
+        /* --- 3. 卡片文字內容 --- */
+        .product-info {
+            padding: 2rem;
+            flex-grow: 1; /* 讓內容填滿剩餘空間 */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-info h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+            color: var(--primary-color);
+        }
+
+        .product-info p {
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+
+        /* --- 4. 按鈕樣式與動效 --- */
+        .product-btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 400;
+            font-size: 0.9rem;
+            transition: all 0.3s ease; /* 按鈕懸停動效 */
+        }
+
+        .product-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3);
+        }
+
+        /* ==============================
+           CSS 動畫觸發類 (JS 呼叫)
+           ============================== */
+        .product-card.animate-in {
+            opacity: 1;
+            transform: translateY(0); /* 回到原位 */
+        }
+
+        /* ==============================
+           其他區塊 (保留上次的簡約樣式)
+           ============================== */
+        #about { background: var(--bg-light); text-align: center; display: flex; align-items: center; justify-content: center; }
+        .about-content { max-width: 700px; }
+        #team { background: var(--bg-light); }
+        .team-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 3rem; }
+        .team-member { text-align: center; }
+        .member-img { width: 130px; height: 130px; background: #dfe6e9; border-radius: 50%; margin: 0 auto 1.5rem; }
+        #contact { background: var(--white); }
+        .contact-form { max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 1.2rem; }
+        input, textarea { width: 100%; padding: 1rem; border: 1px solid #ddd; border-radius: 5px; font-family: inherit; }
+        button { background: var(--accent-color); color: white; padding: 1rem; border: none; border-radius: 5px; cursor: pointer; width: 100%; font-size: 1rem; transition: background 0.3s; }
+        button:hover { background: var(--accent-hover); }
+        footer { text-align: center; padding: 3rem; background: var(--primary-color); color: #a4b0be; font-size: 0.9rem; }
+
+        @media (max-width: 768px) { .nav-links { display: none; } section { padding: 80px 5%; } }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">MINIMAL CO.</div>
+        <ul class="nav-links">
+            <li><a href="#about">公司介紹</a></li>
+            <li><a href="#products">產品展示</a></li>
+            <li><a href="#team">專業團隊</a></li>
+            <li><a href="#contact">聯絡我們</a></li>
+        </ul>
+    </nav>
+
+    <section id="about">
+        <div class="about-content">
+            <h2>關於我們</h2>
+            <p>我們致力於將複雜的技術轉化為直覺的體驗。專注於高品質的軟體開發與美學設計，協助企業在數位時代脫穎而出。</p>
+        </div>
+    </section>
+
+    <section id="products">
+        <h2>精選產品</h2>
+        <div class="product-grid">
+            
+            <div class="product-card">
+                <div class="product-img-holder">
+                    </div>
+                <div class="product-info">
+                    <h3>智能管理系統 Pro</h3>
+                    <p>專為中大型企業設計的雲端 ERP 解決方案，整合財務、人資與供應鏈管理，提升 40% 營運效率。</p>
+                    <a href="#" class="product-btn">了解更多</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-img-holder">
+                    </div>
+                <div class="product-info">
+                    <h3>數據分析儀表板</h3>
+                    <p>即時視覺化您的商業數據。透過 AI 驅動的預測模型，一眼看穿數據背後的關鍵洞察與未來趨勢。</p>
+                    <a href="#" class="product-btn">免費試用</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-img-holder">
+                    </div>
+                <div class="product-info">
+                    <h3>客製化行動應用</h3>
+                    <p>從 UI/UX 設計到前後端開發，為您的品牌打造流暢、高黏著度的 iOS 與 Android 行動體驗。</p>
+                    <a href="#" class="product-btn">案例研究</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="team">
+        <h2>專業團隊</h2>
+        <div class="team-grid">
+            <div class="team-member">
+                <div class="member-img"></div>
+                <h3>張小明</h3>
+                <p>創辦人 / CEO</p>
+            </div>
+            <div class="team-member">
+                <div class="member-img"></div>
+                <h3>李華</h3>
+                <p>技術長 / CTO</p>
+            </div>
+            <div class="team-member">
+                <div class="member-img"></div>
+                <h3>王美</h3>
+                <p>設計總監</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2>聯絡我們</h2>
+        <form class="contact-form">
+            <div class="form-group"><input type="text" placeholder="您的姓名" required></div>
+            <div class="form-group"><input type="email" placeholder="電子郵件" required></div>
+            <div class="form-group"><textarea rows="5" placeholder="您的訊息"></textarea></div>
+            <button type="submit">發送訊息</button>
+        </form>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 極簡科技 Minimal Co. 版權所有</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 獲取所有需要動畫的產品卡片
+            const cards = document.querySelectorAll('.product-card');
+
+            // 建立 Intersection Observer (觀察器)
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    // 當卡片進入螢幕可視範圍
+                    if (entry.isIntersecting) {
+                        // 加入延遲效果，讓卡片一個個排隊出現 (Staggered animation)
+                        setTimeout(() => {
+                            entry.target.classList.add('animate-in');
+                        }, index * 150); // 每個卡片間隔 150 毫秒
+
+                        // 動畫執行後就停止觀察，避免重複觸發
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.2 // 卡片露出 20% 時觸發
+            });
+
+            // 開始觀察每一張卡片
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+
+</body>
+</html>
